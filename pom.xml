@@ -3,9 +3,46 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.optionfactory</groupId>
     <artifactId>hibernate-json</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
-    <description>Hibernate + JSON</description>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>Custom Hibernate types for serializing fields as JSON, using either jackson or gson</description>
+    <licenses>
+        <license>
+            <name>Simplified BSD License</name>
+            <url>http://www.opensource.org/licenses/BSD-3-Clause</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Roberto Ferranti</name>
+            <email>roberto.ferranti@optionfactory.net</email>
+            <organization>OptionFactory</organization>
+            <organizationUrl>http://optionfactory.net</organizationUrl>
+        </developer>
+        <developer>
+            <name>Francesco Degrassi</name>
+            <email>francesco.degrassi@optionfactory.net</email>
+            <organization>OptionFactory</organization>
+            <organizationUrl>http://optionfactory.net</organizationUrl>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:https://github.com/optionfactory/hibernate-json.git</connection>
+        <developerConnection>scm:git:https://github.com/optionfactory/hibernate-json.git</developerConnection>
+        <url>https://github.com/optionfactory/hibernate-json</url>
+    </scm>
+     <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
     <properties>
         <aspectj.version>1.8.3</aspectj.version>
         <aspectj.plugin.version>1.6</aspectj.plugin.version>
