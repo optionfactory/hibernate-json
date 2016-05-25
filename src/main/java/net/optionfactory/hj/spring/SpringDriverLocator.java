@@ -3,15 +3,15 @@ package net.optionfactory.hj.spring;
 import java.util.Map;
 import java.util.Optional;
 import net.optionfactory.hj.JsonDriver;
+import net.optionfactory.hj.JsonDriverLocator;
 import net.optionfactory.hj.JsonDriverNotFound;
-import net.optionfactory.hj.JsonType;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 @Configurable
-public class SpringDriverLocator implements JsonType.DriverLocator, ApplicationContextAware {
+public class SpringDriverLocator implements JsonDriverLocator, ApplicationContextAware {
 
     private ApplicationContext ac;
 

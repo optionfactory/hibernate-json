@@ -15,7 +15,7 @@ import java.util.Arrays;
 import net.optionfactory.hj.JsonMappingException;
 import net.optionfactory.hj.TypeDescriptor;
 import net.optionfactory.hj.JsonDriver;
-import org.springframework.core.ResolvableType;
+import net.optionfactory.hj.jackson.reflection.ResolvableType;
 
 /**
  *
