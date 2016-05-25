@@ -1,5 +1,6 @@
 package net.optionfactory.hj;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.optionfactory.hj.JsonType;
 import net.optionfactory.hj.JsonDriver;
 import com.google.gson.Gson;
@@ -18,6 +19,7 @@ import javax.persistence.Table;
 import javax.sql.DataSource;
 import net.optionfactory.hj.gson.GsonJsonDriver;
 import net.optionfactory.hj.JsonDriverTest.SpringConf;
+import net.optionfactory.hj.jackson.JacksonJsonDriver;
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.Type;
 import org.junit.Assert;
@@ -78,7 +80,7 @@ public class JsonDriverTest {
         }
         @Bean
         public JsonDriver jacksonDriver() {
-            return new GsonJsonDriver(new Gson());
+            return new JacksonJsonDriver(new ObjectMapper());
         }
 
     }
