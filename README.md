@@ -17,11 +17,11 @@ For this to work, you need to use @EnableSpringConfigured or define an Annotatio
 
 ```java
 @EnableSpringConfigured
-public static class SpringConf {
+public class SpringConf {
     /* datasource, txManager, SessionFactory, etc */
     @Bean
     public JsonDriver myJsonDriverBeanName() {
-        return new JackJsonDriver(new Gson());
+        return new JacksonJsonDriver(new ObjectMapper());
     }
 }
     
@@ -69,7 +69,7 @@ public class EntityWithJsonFields {
 
 public class MyDriverLocator implements JsonType.DriverLocator {
     private static JsonDriver driver = new JacksonJsonDriver(new ObjectMapper());
-    public JsonDriver locate(Optional<String> name) {
+    public JsonDriver locate(Annotation[] fieldAnnotations, Optional<String> name) {
         return driver; 
     }
 }
