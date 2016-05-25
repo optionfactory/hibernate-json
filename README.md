@@ -82,7 +82,8 @@ public class MyDriverLocator implements JsonType.DriverLocator {
 <!-- mappings -->
 <property name="priority">
     <type name="com.mycompany.usertypes.DefaultValueIntegerType">
-        <param name="net.optionfactory.hj.driver">myJsonDriverBeanName</param> <!-- Only required if more than one driver in ApplicationContext -->
+        <!-- Only required if more than one driver in ApplicationContext -->    
+        <param name="jsonDriverName">myJsonDriverBeanName</param> 
     </type>
 </property>
 <!-- more mappings -->
@@ -94,7 +95,7 @@ public class MyDriverLocator implements JsonType.DriverLocator {
 <!-- mappings -->
 <property name="priority">
     <type name="com.mycompany.usertypes.DefaultValueIntegerType">
-        <param name="net.optionfactory.hj.locator">com.example.MyDriverLocator</param>
+        <param name="jsonDriverLocatorClass">com.example.MyDriverLocator</param>
     </type>
 </property>
 <!-- more mappings -->
