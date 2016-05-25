@@ -21,8 +21,6 @@ import org.hibernate.usertype.UserType;
 public class JsonType implements UserType, DynamicParameterizedType {
 
     public static final String TYPE = "net.optionfactory.hj.JsonType";
-    public static final String WITH_DRIVER_PROPERTY_NAME = "net.optionfactory.hj.driver";
-    public static final String WITH_LOCATOR_PROPERTY_NAME = "net.optionfactory.hj.locator";
     private static final int[] SQL_TYPES = new int[]{
         StandardBasicTypes.TEXT.sqlType()
     };

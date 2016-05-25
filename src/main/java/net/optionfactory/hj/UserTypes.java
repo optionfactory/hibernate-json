@@ -8,6 +8,9 @@ import org.hibernate.usertype.DynamicParameterizedType;
 
 public class UserTypes {
 
+    public static final String DRIVER_NAME_KEY = "jsonDriverName";
+    public static final String DRIVER_LOCATOR_CLASS_KEY = "jsonDriverLocatorClass";
+
     public static Class<?> entityClass(Properties properties) {
         try {
             return Class.forName(properties.getProperty(DynamicParameterizedType.ENTITY));
@@ -29,16 +32,20 @@ public class UserTypes {
     }
 
     public static Optional<String> driverName(final Field field, Properties properties) {
-        final String driverName = field.getAnnotation(JsonType.WithDriver.class) != null ? field.getAnnotation(JsonType.WithDriver.class).value() : properties.getProperty(JsonType.WITH_DRIVER_PROPERTY_NAME, "");
+        final String driverName = field.getAnnotation(JsonType.WithDriver.class) != null
+                ? field.getAnnotation(JsonType.WithDriver.class).value()
+                : properties.getProperty(DRIVER_NAME_KEY, "");
         return driverName.isEmpty() ? Optional.empty() : Optional.of(driverName);
     }
 
     public static JsonDriverLocator makeLocator(final Field field, Properties properties) {
         try {
-            final Class locatorClass = field.getAnnotation(JsonType.WithDriver.class) != null ? field.getAnnotation(JsonType.WithDriver.class).locator() : Class.forName(properties.getProperty(JsonType.WITH_LOCATOR_PROPERTY_NAME, SpringDriverLocator.class.getName()));
+            final Class locatorClass = field.getAnnotation(JsonType.WithDriver.class) != null
+                    ? field.getAnnotation(JsonType.WithDriver.class).locator()
+                    : Class.forName(properties.getProperty(DRIVER_LOCATOR_CLASS_KEY, SpringDriverLocator.class.getName()));
             return (JsonDriverLocator) locatorClass.newInstance();
         } catch (ClassNotFoundException ex) {
-            throw new IllegalStateException(String.format("DriverLocator class not found: %s", properties.getProperty(JsonType.WITH_LOCATOR_PROPERTY_NAME)));
+            throw new IllegalStateException(String.format("DriverLocator class not found: %s", properties.getProperty(DRIVER_LOCATOR_CLASS_KEY)));
         } catch (InstantiationException | IllegalAccessException ex) {
             throw new IllegalStateException("Cannot instantiate DriverLocator", ex);
         }
