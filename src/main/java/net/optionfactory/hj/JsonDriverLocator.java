@@ -1,5 +1,6 @@
 package net.optionfactory.hj;
 
+import java.lang.annotation.Annotation;
 import java.util.Optional;
 
 /**
@@ -8,6 +9,6 @@ import java.util.Optional;
  */
 public interface JsonDriverLocator {
 
-    JsonDriver locate(Optional<String> name);
+    JsonDriver locate(Annotation[] fieldAnnotations, Optional<String> name);
 
 }

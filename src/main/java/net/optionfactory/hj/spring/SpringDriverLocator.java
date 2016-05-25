@@ -1,5 +1,6 @@
 package net.optionfactory.hj.spring;
 
+import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Optional;
 import net.optionfactory.hj.JsonDriver;
@@ -16,7 +17,7 @@ public class SpringDriverLocator implements JsonDriverLocator, ApplicationContex
     private ApplicationContext ac;
 
     @Override
-    public JsonDriver locate(Optional<String> driverName) {
+    public JsonDriver locate(Annotation[] fieldAnnotations, Optional<String> driverName) {
         JsonDriverNotFound.failIf(ac == null, "null ApplicationContext in JsonType. This class is @Configurable. Use @EnableSpringConfigured or define an AnnotationBeanConfigurerAspect and @DependsOn('annotationBeanConfigurerAspect') on your datasource");
         final Map<String, JsonDriver> matchingBeans = ac.getBeansOfType(JsonDriver.class);
         JsonDriverNotFound.failIf(matchingBeans.isEmpty(), "no JsonDriver found in ApplicationContext");

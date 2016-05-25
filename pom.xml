@@ -87,7 +87,14 @@
             <artifactId>spring-aspects</artifactId>
             <version>${spring.version}</version>
             <optional>true</optional>
-        </dependency>                   
+        </dependency>
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <version>1.2</version>
+            <optional>true</optional>
+        </dependency>
+                           
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

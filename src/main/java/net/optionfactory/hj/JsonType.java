@@ -46,7 +46,7 @@ public class JsonType implements UserType, DynamicParameterizedType {
         final Field field = UserTypes.mappedField(declaringClass, properties);
         final JsonDriverLocator locator = UserTypes.makeLocator(field, properties);
         final Optional<String> driverName = UserTypes.driverName(field, properties);
-        json = locator.locate(driverName);
+        json = locator.locate(field.getAnnotations(), driverName);
         type = json.fieldType(field, declaringClass);
     }
 
