@@ -12,8 +12,8 @@ Custom Hibernate types for serializing fields as JSON
 
 ## Example usage
 ### Providing a JSON driver instance through Spring
-The default DriverLocator is @Configurable and so looks up JsonDriver instances in current Spring ApplicationContext.
-For this to work, you need to use @EnableSpringConfigured or define an AnnotationBeanConfigurerAspect and @DependsOn('annotationBeanConfigurerAspect') on your datasource.
+The default DriverLocator is `@Configurable` and so looks up `JsonDriver` instances in current Spring `ApplicationContext`.
+For this to work, you need to use `@EnableSpringConfigured` or define an `AnnotationBeanConfigurerAspect` and `@DependsOn('annotationBeanConfigurerAspect')` on your `DataSource`.
 
 ```java
 @EnableSpringConfigured
@@ -37,7 +37,7 @@ public class EntityWithJsonFields {
 }
 ```
 
-If you have multiple JSON driver instances defined in your application context, you need to specify the name of the one to use:
+If you have multiple `JsonDriver` instances defined in your application context, you need to specify the name of the one to use:
 
 ```java
 @Entity
@@ -53,7 +53,7 @@ public class EntityWithJsonFields {
 }
 ```
 
-### Providing a JSON driver instance without Spring
+### Providing a JsonDriver instance without Spring
 ```java
 @Entity
 public class EntityWithJsonFields {
