@@ -7,6 +7,7 @@
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Custom Hibernate types for serializing fields as JSON, using either jackson or gson</description>
+    <url>https://github.com/optionfactory/hibernate-json</url>
     <licenses>
         <license>
             <name>Simplified BSD License</name>
