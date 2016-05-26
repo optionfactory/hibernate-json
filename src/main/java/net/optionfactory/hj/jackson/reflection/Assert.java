@@ -16,9 +16,6 @@ package net.optionfactory.hj.jackson.reflection;
  * limitations under the License.
  */
 
-import java.util.Collection;
-import java.util.Map;
-
 /**
  * Assertion utility class that assists in validating arguments.
  *

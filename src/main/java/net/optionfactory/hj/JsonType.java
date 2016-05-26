@@ -1,6 +1,5 @@
 package net.optionfactory.hj;
 
-import net.optionfactory.hj.spring.SpringDriverLocator;
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,33 +9,47 @@ import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Optional;
 import java.util.Properties;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.usertype.DynamicParameterizedType;
 import org.hibernate.usertype.UserType;
+import org.postgresql.util.PGobject;
 
 public class JsonType implements UserType, DynamicParameterizedType {
 
     public static final String TYPE = "net.optionfactory.hj.JsonType";
-    private static final int[] SQL_TYPES = new int[]{
-        StandardBasicTypes.TEXT.sqlType()
-    };
 
-    @Target(ElementType.FIELD)
+    public enum ColumnType {
+        Text(Types.LONGVARCHAR), MysqlJson(Types.JAVA_OBJECT), PostgresJson(Types.JAVA_OBJECT), PostgresJsonb(Types.OTHER);
+
+        private final int[] sqlType;
+
+        ColumnType(int sqlType) {
+            this.sqlType = new int[]{sqlType};
+        }
+        
+        public int[] sqlTypes() {
+            return this.sqlType;
+        }
+    }
+
+    @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface WithDriver {
+    public @interface Conf {
 
-        String value() default "";
+        String driver() default "";
 
-        Class<? extends JsonDriverLocator> locator() default SpringDriverLocator.class;
+        Class<? extends JsonDriverLocator> locator();
+
+        ColumnType type() default ColumnType.Text;
     }
 
     private JsonDriver json;
     private TypeDescriptor type;
-
+    private ColumnType ct;
 
     @Override
     public void setParameterValues(Properties properties) {
@@ -46,12 +59,12 @@ public class JsonType implements UserType, DynamicParameterizedType {
         final Optional<String> driverName = UserTypes.driverName(field, properties);
         json = locator.locate(field.getAnnotations(), driverName);
         type = json.fieldType(field, declaringClass);
+        ct = UserTypes.columnType(field, properties);
     }
-
 
     @Override
     public int[] sqlTypes() {
-        return SQL_TYPES;
+        return ct.sqlTypes();
     }
 
     @Override
@@ -85,11 +98,33 @@ public class JsonType implements UserType, DynamicParameterizedType {
     @Override
     public void nullSafeSet(PreparedStatement ps, Object value, int index, SessionImplementor si) throws HibernateException, SQLException {
         if (value == null) {
-            ps.setNull(index, SQL_TYPES[0]);
+            ps.setNull(index, ct.sqlTypes()[0]);
             return;
         }
+        ps.getConnection().getMetaData().getDatabaseProductName();
         try {
-            ps.setString(index, json.serialize(value, type));
+            final String serialized = json.serialize(value, type);
+            switch (ct) {
+                case Text: 
+                case MysqlJson: {
+                    ps.setString(index, serialized);
+                }
+                break;
+                case PostgresJson: {
+                    final PGobject postgresObject = new PGobject();
+                    postgresObject.setType("json");
+                    postgresObject.setValue(serialized);
+                    ps.setObject(index, postgresObject);
+                }
+                break;
+                case PostgresJsonb: {
+                    final PGobject postgresObject = new PGobject();
+                    postgresObject.setType("jsonb");
+                    postgresObject.setValue(serialized);
+                    ps.setObject(index, postgresObject);
+                }
+                break;
+            }
         } catch (Exception ex) {
             throw new JsonMappingException(ex);
         }

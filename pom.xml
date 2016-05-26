@@ -33,7 +33,7 @@
         <developerConnection>scm:git:https://github.com/optionfactory/hibernate-json.git</developerConnection>
         <url>https://github.com/optionfactory/hibernate-json</url>
     </scm>
-     <distributionManagement>
+    <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -86,6 +86,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
             <version>${spring.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.4.1208</version>
             <optional>true</optional>
         </dependency>
         <dependency>

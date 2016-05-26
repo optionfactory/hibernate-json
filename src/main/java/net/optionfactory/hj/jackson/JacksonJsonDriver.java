@@ -12,9 +12,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import net.optionfactory.hj.JsonDriver;
 import net.optionfactory.hj.JsonMappingException;
 import net.optionfactory.hj.TypeDescriptor;
-import net.optionfactory.hj.JsonDriver;
 import net.optionfactory.hj.jackson.reflection.ResolvableType;
 
 /**
