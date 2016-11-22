@@ -8,6 +8,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
+import com.fasterxml.jackson.databind.type.TypeBindings;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.databind.type.TypeModifier;
 import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -24,6 +27,16 @@ import net.optionfactory.hj.jackson.reflection.ResolvableType;
 public class JacksonJsonDriver implements JsonDriver {
 
     private final ObjectMapper mapper;
+    private final static Field TYPE_FACTORY_MODIFIERS_FIELD;
+
+    static {
+        try {
+            TYPE_FACTORY_MODIFIERS_FIELD = TypeFactory.class.getDeclaredField("_modifiers");
+            TYPE_FACTORY_MODIFIERS_FIELD.setAccessible(true);
+        } catch (NoSuchFieldException | SecurityException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
     public JacksonJsonDriver(ObjectMapper mapper) {
         this.mapper = mapper;
@@ -48,16 +61,47 @@ public class JacksonJsonDriver implements JsonDriver {
     }
 
     @Override
-    public JacksonTypeDescriptor fieldType(Field field, Class<?> context) {        
+    public JacksonTypeDescriptor fieldType(Field field, Class<?> context) {
         final ResolvableType rt = ResolvableType.forField(field, context);
         return new JacksonTypeDescriptor(resolvableTypeToJavaType(rt));
     }
-    
+
     
     
     private JavaType resolvableTypeToJavaType(ResolvableType source){
         final JavaType[] generics = Arrays.stream(source.getGenerics()).map(this::resolvableTypeToJavaType).toArray(n -> new JavaType[n]);
-        return mapper.getTypeFactory().constructParametricType(source.resolve(), generics);
+        final Class<?> sourceType = source.resolve();
+        return applyModifiers(
+                mapper.getTypeFactory().constructParametricType(sourceType, generics), 
+                sourceType);
+    }
+
+    private TypeModifier[] exfiltrateModifiers(TypeFactory tf) {
+        try {
+            return (TypeModifier[]) TYPE_FACTORY_MODIFIERS_FIELD.get(tf);
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private JavaType applyModifiers(JavaType resultType, Class<?> sourceType) throws IllegalStateException {
+        TypeModifier[] _modifiers = exfiltrateModifiers(mapper.getTypeFactory());
+        if (_modifiers != null) {
+            TypeBindings b = resultType.getBindings();
+            if (b == null) {
+                b = TypeBindings.emptyBindings();
+            }
+            for (TypeModifier mod : _modifiers) {
+                JavaType t = mod.modifyType(resultType, sourceType, b, mapper.getTypeFactory());
+                if (t == null) {
+                    throw new IllegalStateException(String.format(
+                            "TypeModifier %s (of type %s) return null for type %s",
+                            mod, mod.getClass().getName(), resultType));
+                }
+                resultType = t;
+            }
+        }
+        return resultType;
     }
 
     /**
@@ -103,7 +147,7 @@ public class JacksonJsonDriver implements JsonDriver {
             throw com.fasterxml.jackson.databind.JsonMappingException.fromUnexpectedIOE(e);
         }
     }
-    
+
     // duplicated from ObjectMapper for visibility reasons.
     private void _configAndWriteCloseable(JsonGenerator g, Object value, SerializationConfig cfg)
         throws IOException
@@ -126,19 +170,19 @@ public class JacksonJsonDriver implements JsonDriver {
                 try {
                     g.close();
                 } catch (IOException ioe) { }
-            }
+                }
             if (toClose != null) {
                 try {
                     toClose.close();
                 } catch (IOException ioe) { }
+                }
             }
         }
-    }    
-    
+
     // duplicated from ObjectMapper for visibility reasons.
     private DefaultSerializerProvider _serializerProvider(SerializationConfig cfg) {
         return ((DefaultSerializerProvider) mapper.getSerializerProvider()).createInstance(cfg, mapper.getSerializerFactory());
-    }    
+    }
 
 
 }
