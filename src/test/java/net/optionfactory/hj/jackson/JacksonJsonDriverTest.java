@@ -1,40 +1,50 @@
 package net.optionfactory.hj.jackson;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import java.io.IOException;
+import com.fasterxml.jackson.databind.type.TypeBindings;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.databind.type.TypeModifier;
 import java.lang.reflect.Field;
-import java.util.Optional;
+import java.lang.reflect.Type;
 import org.junit.Test;
 import org.junit.Assert;
 
 public class JacksonJsonDriverTest {
 
-    public static class Bean {
+    public static class Bean<T> {
 
-        public Optional<Integer> value;
+        public T value;
     }
+    
+    public static class LongBean extends Bean<Number> {}
 
     @Test
-    public void asd() throws JsonProcessingException, NoSuchFieldException {
+    public void testRegisteredJacksonTypeModifiersAreInvoked() throws JsonProcessingException, NoSuchFieldException {
 
-        Bean b = new Bean();
-        b.value = Optional.empty();
+        Bean<Number> b = new LongBean();
+        b.value = 3l;
 
+        final SpyTypeModifier spyTypeModifier = new SpyTypeModifier();
         final ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new Jdk8Module());
+        mapper.setTypeFactory(mapper.getTypeFactory().withModifier(spyTypeModifier));
         JacksonJsonDriver driver = new JacksonJsonDriver(mapper);
         Field field = Bean.class.getField("value");
-        String got = driver.serialize(b.value, driver.fieldType(field, Bean.class));
-        Assert.assertEquals("null", got);
+        driver.serialize(b.value, driver.fieldType(field, LongBean.class));
+        Assert.assertTrue("Configured type modifier must be called", spyTypeModifier.called);
 
     }
 
-    
+    public static class SpyTypeModifier extends TypeModifier {
+
+        public boolean called = false;
+
+        @Override
+        public JavaType modifyType(JavaType type, Type jdkType, TypeBindings context, TypeFactory typeFactory) {
+            called = true;
+            return type;
+        }
+    }
+
 }

@@ -27,6 +27,7 @@ import net.optionfactory.hj.jackson.reflection.ResolvableType;
 public class JacksonJsonDriver implements JsonDriver {
 
     private final ObjectMapper mapper;
+    private final TypeModifier[] modifiers;
     private final static Field TYPE_FACTORY_MODIFIERS_FIELD;
 
     static {
@@ -40,6 +41,11 @@ public class JacksonJsonDriver implements JsonDriver {
 
     public JacksonJsonDriver(ObjectMapper mapper) {
         this.mapper = mapper;
+        try {
+            this.modifiers = (TypeModifier[]) TYPE_FACTORY_MODIFIERS_FIELD.get(mapper.getTypeFactory());
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -65,8 +71,6 @@ public class JacksonJsonDriver implements JsonDriver {
         final ResolvableType rt = ResolvableType.forField(field, context);
         return new JacksonTypeDescriptor(resolvableTypeToJavaType(rt));
     }
-
-    
     
     private JavaType resolvableTypeToJavaType(ResolvableType source){
         final JavaType[] generics = Arrays.stream(source.getGenerics()).map(this::resolvableTypeToJavaType).toArray(n -> new JavaType[n]);
@@ -76,22 +80,14 @@ public class JacksonJsonDriver implements JsonDriver {
                 sourceType);
     }
 
-    private TypeModifier[] exfiltrateModifiers(TypeFactory tf) {
-        try {
-            return (TypeModifier[]) TYPE_FACTORY_MODIFIERS_FIELD.get(tf);
-        } catch (IllegalAccessException | IllegalArgumentException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    // duplicated from TypeFactory._fromAny
     private JavaType applyModifiers(JavaType resultType, Class<?> sourceType) throws IllegalStateException {
-        TypeModifier[] _modifiers = exfiltrateModifiers(mapper.getTypeFactory());
-        if (_modifiers != null) {
+        if (modifiers != null) {
             TypeBindings b = resultType.getBindings();
             if (b == null) {
                 b = TypeBindings.emptyBindings();
             }
-            for (TypeModifier mod : _modifiers) {
+            for (TypeModifier mod : modifiers) {
                 JavaType t = mod.modifyType(resultType, sourceType, b, mapper.getTypeFactory());
                 if (t == null) {
                     throw new IllegalStateException(String.format(
