@@ -13,7 +13,7 @@ import java.sql.Types;
 import java.util.Optional;
 import java.util.Properties;
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.usertype.DynamicParameterizedType;
 import org.hibernate.usertype.UserType;
 import org.postgresql.util.PGobject;
@@ -83,7 +83,7 @@ public class JsonType implements UserType, DynamicParameterizedType {
     }
 
     @Override
-    public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor si, Object owner) throws HibernateException, SQLException {
+    public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner) throws HibernateException, SQLException {
         final String string = rs.getString(names[0]);
         if (rs.wasNull() || string == null || string.isEmpty()) {
             return null;
@@ -96,7 +96,7 @@ public class JsonType implements UserType, DynamicParameterizedType {
     }
 
     @Override
-    public void nullSafeSet(PreparedStatement ps, Object value, int index, SessionImplementor si) throws HibernateException, SQLException {
+    public void nullSafeSet(PreparedStatement ps, Object value, int index, SharedSessionContractImplementor si) throws HibernateException, SQLException {
         if (value == null) {
             ps.setNull(index, ct.sqlTypes()[0]);
             return;
@@ -129,6 +129,7 @@ public class JsonType implements UserType, DynamicParameterizedType {
             throw new JsonMappingException(ex);
         }
     }
+    
 
     @Override
     public Object deepCopy(Object value) throws HibernateException {

@@ -55,7 +55,7 @@ public class JsonDriverTest {
             
             final LocalSessionFactoryBean factory = new LocalSessionFactoryBean();
             factory.setDataSource(dataSource);
-            factory.setPackagesToScan(new String[]{SpringConf.class.getPackage().getName()});
+            factory.setPackagesToScan(SpringConf.class.getPackage().getName());
             factory.setHibernateProperties(hp);
             hp.put("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
             hp.put("hibernate.hbm2ddl.auto", "create-drop");
