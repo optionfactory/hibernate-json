@@ -30,7 +30,7 @@ public class JsonType implements UserType, DynamicParameterizedType {
         ColumnType(int sqlType) {
             this.sqlType = new int[]{sqlType};
         }
-        
+
         public int[] sqlTypes() {
             return this.sqlType;
         }
@@ -86,7 +86,7 @@ public class JsonType implements UserType, DynamicParameterizedType {
     public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner) throws HibernateException, SQLException {
         final String string = rs.getString(names[0]);
         if (rs.wasNull() || string == null || string.isEmpty()) {
-            return null;
+            return json.deserialize("null", type);
         }
         try {
             return json.deserialize(string, type);
@@ -105,7 +105,7 @@ public class JsonType implements UserType, DynamicParameterizedType {
         try {
             final String serialized = json.serialize(value, type);
             switch (ct) {
-                case Text: 
+                case Text:
                 case MysqlJson: {
                     ps.setString(index, serialized);
                 }
@@ -129,7 +129,6 @@ public class JsonType implements UserType, DynamicParameterizedType {
             throw new JsonMappingException(ex);
         }
     }
-    
 
     @Override
     public Object deepCopy(Object value) throws HibernateException {
