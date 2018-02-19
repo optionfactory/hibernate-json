@@ -23,6 +23,12 @@ public class SpringConf {
     public JsonDriver myJsonDriverBeanName() {
         return new JacksonJsonDriver(new ObjectMapper());
     }
+    
+    @Bean
+    @DependsOn(SpringConfiguredConfiguration.BEAN_CONFIGURER_ASPECT_BEAN_NAME)
+    public DataSource dataSource() {
+        // ...
+    }
 }
     
 @Entity
