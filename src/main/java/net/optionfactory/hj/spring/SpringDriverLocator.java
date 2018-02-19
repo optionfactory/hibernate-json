@@ -18,7 +18,7 @@ public class SpringDriverLocator implements JsonDriverLocator, ApplicationContex
 
     @Override
     public JsonDriver locate(Annotation[] fieldAnnotations, Optional<String> driverName) {
-        JsonDriverNotFound.failIf(ac == null, "null ApplicationContext in JsonType. This class is @Configurable. Use @EnableSpringConfigured or define an AnnotationBeanConfigurerAspect and @DependsOn('annotationBeanConfigurerAspect') on your datasource");
+        JsonDriverNotFound.failIf(ac == null, "null ApplicationContext in JsonType. This class is @Configurable. Use @EnableSpringConfigured (or manually define an AnnotationBeanConfigurerAspect) AND add @DependsOn(SpringConfiguredConfiguration.BEAN_CONFIGURER_ASPECT_BEAN_NAME) (or whatever name your annotationBeanConfigurerAspect has) on your datasource");
         final Map<String, JsonDriver> matchingBeans = ac.getBeansOfType(JsonDriver.class);
         JsonDriverNotFound.failIf(matchingBeans.isEmpty(), "no JsonDriver found in ApplicationContext");
         if (driverName.isPresent()) {
