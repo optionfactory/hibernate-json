@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import net.optionfactory.hj.JsonDriver;
 import net.optionfactory.hj.JsonMappingException;
 import net.optionfactory.hj.TypeDescriptor;
@@ -15,22 +16,41 @@ public class GsonJsonDriver implements JsonDriver {
     public GsonJsonDriver(Gson json) {
         this.json = json;
     }
-    
-    
+
     @Override
     public Object deserialize(String value, TypeDescriptor type) {
-        try{
+        try {
             return json.fromJson(value, type.as(TypeToken.class).getType());
-        }catch(JsonParseException ex){
+        } catch (JsonParseException ex) {
             throw new JsonMappingException(ex);
         }
     }
 
     @Override
+    public Object deserialize(String value, Type type) {
+        try {
+            return json.fromJson(value, type);
+        } catch (JsonParseException ex) {
+            throw new JsonMappingException(ex);
+        }
+    }
+    
+    
+    @Override
     public String serialize(Object value, TypeDescriptor type) {
-        try{
+        try {
             return json.toJson(value, type.as(TypeToken.class).getType());
-        }catch(JsonParseException ex){
+        } catch (JsonParseException ex) {
+            throw new JsonMappingException(ex);
+        }
+    }
+
+
+    @Override
+    public String serialize(Object value, Type type) {
+        try {
+            return json.toJson(value, type);
+        } catch (JsonParseException ex) {
             throw new JsonMappingException(ex);
         }
     }
