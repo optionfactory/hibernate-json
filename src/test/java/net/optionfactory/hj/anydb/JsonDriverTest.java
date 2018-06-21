@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -45,178 +44,182 @@ import org.springframework.transaction.support.TransactionTemplate;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class JsonDriverTest {
 
-    @EnableSpringConfigured
-    public static class SpringConf {
+  @EnableSpringConfigured
+  public static class SpringConf {
 
-        @Bean
-        public DataSource dataSource() {
-            return new SimpleDriverDataSource(new org.hsqldb.jdbcDriver(), "jdbc:hsqldb:mem:test", "sa", "");
-        }
-
-        @Bean
-        public LocalSessionFactoryBean sessionFactory(final DataSource dataSource) throws IOException, Exception {
-            final Properties hp = new Properties();
-
-            final LocalSessionFactoryBean factory = new LocalSessionFactoryBean();
-            factory.setDataSource(dataSource);
-            factory.setPackagesToScan(SpringConf.class.getPackage().getName());
-            factory.setHibernateProperties(hp);
-            hp.put("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
-            hp.put("hibernate.hbm2ddl.auto", "create-drop");
-            return factory;
-        }
-
-        @Bean
-        public PlatformTransactionManager transactionManager(SessionFactory sessionFatory) {
-            final HibernateTransactionManager txm = new HibernateTransactionManager();
-            txm.setSessionFactory(sessionFatory);
-            return txm;
-        }
-
-        @Bean
-        public TransactionTemplate transactionTemplate(PlatformTransactionManager ptm) {
-            return new TransactionTemplate(ptm);
-        }
-
-        @Bean
-        public JsonDriver gsonDriver() {
-            return new GsonJsonDriver(new Gson());
-        }
-
-        @Bean
-        public JsonDriver jacksonDriver() {
-            return new JacksonJsonDriver(new ObjectMapper());
-        }
-
+    @Bean
+    public DataSource dataSource() {
+      return new SimpleDriverDataSource(new org.hsqldb.jdbcDriver(), "jdbc:hsqldb:mem:test", "sa", "");
     }
 
-    @Entity
-    @Table(name = "entityWithJsonFields")
-    public static class EntityWithJsonFields {
+    @Bean
+    public LocalSessionFactoryBean sessionFactory(final DataSource dataSource) throws IOException, Exception {
+      final Properties hp = new Properties();
 
-        @Id
-        @GeneratedValue
-        public Integer id;
-
-        @Type(type = JsonType.TYPE)
-        @JsonType.Conf(driver = "gsonDriver", locator = SpringDriverLocator.class)
-        public List<Map<Integer, Set<Long>>> fieldMappedWithGson;
-
-        @Type(type = JsonType.TYPE)
-        @JsonType.Conf(driver = "jacksonDriver", locator = SpringDriverLocator.class)
-        public List<Map<Integer, Set<Long>>> fieldMappedWithJackson;
-
+      final LocalSessionFactoryBean factory = new LocalSessionFactoryBean();
+      factory.setDataSource(dataSource);
+      factory.setPackagesToScan(SpringConf.class.getPackage().getName());
+      factory.setHibernateProperties(hp);
+      hp.put("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
+      hp.put("hibernate.hbm2ddl.auto", "create-drop");
+      return factory;
     }
 
-    @Autowired
-    private SessionFactory hibernate;
-
-    @Autowired
-    private TransactionTemplate tt;
-
-    @Test
-    public void canSaveAndRetrieveWithGson() {
-        final Long longValue = 123L;
-
-        final Serializable id = tt.execute(status -> {
-            final EntityWithJsonFields entity = new EntityWithJsonFields();
-            entity.fieldMappedWithGson = Arrays.asList(Collections.singletonMap(1, Collections.singleton(longValue)));
-            return hibernate.getCurrentSession().save(entity);
-        });
-
-        final Long reloadedValue = tt.execute(status -> {
-            final EntityWithJsonFields loaded = (EntityWithJsonFields) hibernate.getCurrentSession().get(EntityWithJsonFields.class, id);
-            return loaded.fieldMappedWithGson.get(0).get(1).iterator().next();
-        });
-
-        Assert.assertEquals(longValue, reloadedValue);
+    @Bean
+    public PlatformTransactionManager transactionManager(SessionFactory sessionFatory) {
+      final HibernateTransactionManager txm = new HibernateTransactionManager();
+      txm.setSessionFactory(sessionFatory);
+      return txm;
     }
 
-    @Test
-    public void canSaveAndRetrieveWithJackson() {
-        final Long longValue = 456L;
-
-        final Serializable id = tt.execute(status -> {
-            final EntityWithJsonFields entity = new EntityWithJsonFields();
-            entity.fieldMappedWithJackson = Arrays.asList(Collections.singletonMap(1, Collections.singleton(longValue)));
-            return hibernate.getCurrentSession().save(entity);
-        });
-
-        final Long reloadedValue = tt.execute(status -> {
-            final EntityWithJsonFields loaded = (EntityWithJsonFields) hibernate.getCurrentSession().get(EntityWithJsonFields.class, id);
-            return loaded.fieldMappedWithJackson.get(0).get(1).iterator().next();
-        });
-
-        Assert.assertEquals(longValue, reloadedValue);
+    @Bean
+    public TransactionTemplate transactionTemplate(PlatformTransactionManager ptm) {
+      return new TransactionTemplate(ptm);
     }
 
-    public static class StringWrapper {
-
-        public String a;
+    @Bean
+    public JsonDriver gsonDriver() {
+      return new GsonJsonDriver(new Gson());
     }
 
-    @Entity
-    @Table(name = "entityWithDynamicJsonFields")
-    public static class EntityWithDynamicJsonFields {
-
-        @Id
-        @GeneratedValue
-        public Integer id;
-
-        @Type(type = JsonDynamicType.TYPE)
-        @JsonType.Conf(driver = "gsonDriver", locator = SpringDriverLocator.class)
-        @Columns(columns = {
-            @Column(name = "a")
-            ,@Column(name = "b")})
-        public Object fieldMappedWithGson;
-
-        @Type(type = JsonDynamicType.TYPE)
-        @JsonType.Conf(driver = "jacksonDriver", locator = SpringDriverLocator.class)
-        @Columns(columns = {
-            @Column(name = "c")
-            ,@Column(name = "d")})
-        public Object fieldMappedWithJackson;
-
+    @Bean
+    public JsonDriver jacksonDriver() {
+      return new JacksonJsonDriver(new ObjectMapper());
     }
 
-    @Test
-    public void canSaveAndRetrieveDynamicTypeWithGson() {
-        final StringWrapper value = new StringWrapper();
-        value.a = "something";
-        
-        final Serializable id = tt.execute(status -> {
-            final EntityWithDynamicJsonFields entity = new EntityWithDynamicJsonFields();
-            entity.fieldMappedWithGson = value;
-            return hibernate.getCurrentSession().save(entity);
-        });
+  }
 
-        final StringWrapper reloadedValue = tt.execute(status -> {
-            final EntityWithDynamicJsonFields loaded = (EntityWithDynamicJsonFields) hibernate.getCurrentSession().get(EntityWithDynamicJsonFields.class,
-                    id);
-            return (StringWrapper) loaded.fieldMappedWithGson;
-        });
+  @Entity
+  @Table(name = "entityWithJsonFields")
+  public static class EntityWithJsonFields {
 
-        Assert.assertEquals(value.a, reloadedValue.a);
-    }
+    @Id
+    @GeneratedValue
+    public Integer id;
 
-    @Test
-    public void canSaveAndRetrieveDynamicTypeWithJackson() {
-        final StringWrapper value = new StringWrapper();
-        value.a = "something";
+    @Type(type = JsonType.TYPE)
+    @JsonType.Conf(driver = "gsonDriver", locator = SpringDriverLocator.class)
+    public List<Map<Integer, Set<Long>>> fieldMappedWithGson;
 
-        final Serializable id = tt.execute(status -> {
-            final EntityWithDynamicJsonFields entity = new EntityWithDynamicJsonFields();
-            entity.fieldMappedWithJackson = value;
-            return hibernate.getCurrentSession().save(entity);
-        });
+    @Type(type = JsonType.TYPE)
+    @JsonType.Conf(driver = "jacksonDriver", locator = SpringDriverLocator.class)
+    public List<Map<Integer, Set<Long>>> fieldMappedWithJackson;
 
-        final StringWrapper reloadedValue = tt.execute(status -> {
-            final EntityWithDynamicJsonFields loaded = (EntityWithDynamicJsonFields) hibernate.getCurrentSession().get(EntityWithDynamicJsonFields.class,
-                    id);
-            return (StringWrapper) loaded.fieldMappedWithJackson;
-        });
+  }
 
-        Assert.assertEquals(value.a, reloadedValue.a);
-    }
+  @Autowired
+  private SessionFactory hibernate;
+
+  @Autowired
+  private TransactionTemplate tt;
+
+  @Test
+  public void canSaveAndRetrieveWithGson() {
+    final Long longValue = 123L;
+
+    final Serializable id = tt.execute(status -> {
+      final EntityWithJsonFields entity = new EntityWithJsonFields();
+      entity.fieldMappedWithGson = Arrays.asList(Collections.singletonMap(1, Collections.singleton(longValue)));
+      return hibernate.getCurrentSession().save(entity);
+    });
+
+    final Long reloadedValue = tt.execute(status -> {
+      final EntityWithJsonFields loaded = hibernate.getCurrentSession().get(EntityWithJsonFields.class, id);
+      return loaded.fieldMappedWithGson.get(0).get(1).iterator().next();
+    });
+
+    Assert.assertEquals(longValue, reloadedValue);
+  }
+
+  @Test
+  public void canSaveAndRetrieveWithJackson() {
+    final Long longValue = 456L;
+
+    final Serializable id = tt.execute(status -> {
+      final EntityWithJsonFields entity = new EntityWithJsonFields();
+      entity.fieldMappedWithJackson = Arrays.asList(Collections.singletonMap(1, Collections.singleton(longValue)));
+      return hibernate.getCurrentSession().save(entity);
+    });
+
+    final Long reloadedValue = tt.execute(status -> {
+      final EntityWithJsonFields loaded = hibernate.getCurrentSession().get(EntityWithJsonFields.class, id);
+      return loaded.fieldMappedWithJackson.get(0).get(1).iterator().next();
+    });
+
+    Assert.assertEquals(longValue, reloadedValue);
+  }
+
+  public static class StringWrapper {
+
+    public String a;
+  }
+
+  @Entity
+  @Table(name = "entityWithDynamicJsonFields")
+  public static class EntityWithDynamicJsonFields {
+
+    @Id
+    @GeneratedValue
+    public Integer id;
+
+    @Type(type = JsonDynamicType.TYPE)
+    @JsonType.Conf(driver = "gsonDriver", locator = SpringDriverLocator.class)
+    @Columns(columns = {
+      @Column(name = "field_gson_type")
+      , 
+      @Column(name = "field_gson_value")
+    })
+    public Object fieldMappedWithGson;
+
+    @Type(type = JsonDynamicType.TYPE)
+    @JsonType.Conf(driver = "jacksonDriver", locator = SpringDriverLocator.class)
+    @Columns(columns = {
+      @Column(name = "field_jackson_type")
+      , 
+      @Column(name = "field_jackson_value")
+    })
+    public Object fieldMappedWithJackson;
+
+  }
+
+  @Test
+  public void canSaveAndRetrieveDynamicTypeWithGson() {
+    final StringWrapper value = new StringWrapper();
+    value.a = "something";
+
+    final Serializable id = tt.execute(status -> {
+      final EntityWithDynamicJsonFields entity = new EntityWithDynamicJsonFields();
+      entity.fieldMappedWithGson = value;
+      return hibernate.getCurrentSession().save(entity);
+    });
+
+    final StringWrapper reloadedValue = tt.execute(status -> {
+      final EntityWithDynamicJsonFields loaded = hibernate.getCurrentSession().get(EntityWithDynamicJsonFields.class,
+              id);
+      return (StringWrapper) loaded.fieldMappedWithGson;
+    });
+
+    Assert.assertEquals(value.a, reloadedValue.a);
+  }
+
+  @Test
+  public void canSaveAndRetrieveDynamicTypeWithJackson() {
+    final StringWrapper value = new StringWrapper();
+    value.a = "something";
+
+    final Serializable id = tt.execute(status -> {
+      final EntityWithDynamicJsonFields entity = new EntityWithDynamicJsonFields();
+      entity.fieldMappedWithJackson = value;
+      return hibernate.getCurrentSession().save(entity);
+    });
+
+    final StringWrapper reloadedValue = tt.execute(status -> {
+      final EntityWithDynamicJsonFields loaded = hibernate.getCurrentSession().get(EntityWithDynamicJsonFields.class,
+              id);
+      return (StringWrapper) loaded.fieldMappedWithJackson;
+    });
+
+    Assert.assertEquals(value.a, reloadedValue.a);
+  }
 
 }

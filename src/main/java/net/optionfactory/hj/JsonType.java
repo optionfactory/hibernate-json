@@ -68,7 +68,7 @@ public class JsonType implements UserType, DynamicParameterizedType {
     }
 
     @Override
-    public Class returnedClass() {
+    public Class<?> returnedClass() {
         return type.rawClass();
     }
 

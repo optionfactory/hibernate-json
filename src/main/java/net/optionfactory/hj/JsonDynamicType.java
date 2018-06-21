@@ -1,12 +1,7 @@
 package net.optionfactory.hj;
 
 import java.io.Serializable;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,17 +18,6 @@ import org.postgresql.util.PGobject;
 public class JsonDynamicType implements UserType, DynamicParameterizedType {
 
     public static final String TYPE = "net.optionfactory.hj.JsonDynamicType";
-
-    @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface Conf {
-
-        String driver() default "";
-
-        Class<? extends JsonDriverLocator> locator();
-
-        ColumnType type() default ColumnType.Text;
-    }
 
     private JsonDriver json;
     private TypeDescriptor staticType;
@@ -53,13 +37,13 @@ public class JsonDynamicType implements UserType, DynamicParameterizedType {
     @Override
     public int[] sqlTypes() {
         return new int[]{
-            Types.LONGNVARCHAR,
+            Types.LONGVARCHAR,
             ct.sqlTypes()[0]
         };
     }
 
     @Override
-    public Class returnedClass() {
+    public Class<?> returnedClass() {
         return staticType.rawClass();
     }
 
@@ -98,7 +82,7 @@ public class JsonDynamicType implements UserType, DynamicParameterizedType {
     @Override
     public void nullSafeSet(PreparedStatement ps, Object value, int index, SharedSessionContractImplementor si) throws HibernateException, SQLException {
         if (value == null) {
-            ps.setNull(index, Types.LONGNVARCHAR);
+            ps.setNull(index, Types.LONGVARCHAR);
             ps.setNull(index + 1, ct.sqlTypes()[0]);
             return;
         }
