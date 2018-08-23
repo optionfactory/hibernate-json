@@ -138,7 +138,7 @@ public class JsonMutableType implements UserType, DynamicParameterizedType {
 
     @Override
     public Object replace(Object original, Object target, Object owner) throws HibernateException {
-        return original;
+        return json.deserialize(json.serialize(original, type), type);
     }
 
 }
