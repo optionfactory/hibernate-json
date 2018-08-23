@@ -34,7 +34,18 @@ public class JsonMutableType implements UserType, DynamicParameterizedType {
         final Optional<String> driverName = UserTypes.driverName(field, properties);
         json = locator.locate(field.getAnnotations(), driverName);
         type = json.fieldType(field, declaringClass);
+        ensureEqualsIsOverridden();
         ct = UserTypes.columnType(field, properties);
+    }
+
+    private void ensureEqualsIsOverridden() {
+        try {
+            if (type.rawClass().getDeclaredMethod("equals", Object.class).getDeclaringClass().equals(Object.class)) {
+                throw new IllegalStateException("Class or one of its ancestors (but not Object) must implement equals");
+            }
+        } catch (NoSuchMethodException | SecurityException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override
