@@ -34,7 +34,18 @@ public class JsonMutableType implements UserType, DynamicParameterizedType {
         final Optional<String> driverName = UserTypes.driverName(field, properties);
         json = locator.locate(field.getAnnotations(), driverName);
         type = json.fieldType(field, declaringClass);
+        ensureEqualsIsOverridden();
         ct = UserTypes.columnType(field, properties);
+    }
+
+    private void ensureEqualsIsOverridden() {
+        try {
+            if (type.rawClass().getDeclaredMethod("equals", Object.class).getDeclaringClass().equals(Object.class)) {
+                throw new IllegalStateException("Class or one of its ancestors (but not Object) must implement equals");
+            }
+        } catch (NoSuchMethodException | SecurityException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override
@@ -58,7 +69,8 @@ public class JsonMutableType implements UserType, DynamicParameterizedType {
     }
 
     @Override
-    public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner) throws HibernateException, SQLException {
+    public Object nullSafeGet(ResultSet rs, String[] names,
+            SharedSessionContractImplementor session, Object owner) throws HibernateException, SQLException {
         final String string = rs.getString(names[0]);
         if (rs.wasNull() || string == null || string.isEmpty()) {
             return json.deserialize("null", type);
@@ -71,7 +83,8 @@ public class JsonMutableType implements UserType, DynamicParameterizedType {
     }
 
     @Override
-    public void nullSafeSet(PreparedStatement ps, Object value, int index, SharedSessionContractImplementor si) throws HibernateException, SQLException {
+    public void nullSafeSet(PreparedStatement ps, Object value,
+            int index, SharedSessionContractImplementor si) throws HibernateException, SQLException {
         if (value == null) {
             ps.setNull(index, ct.sqlTypes()[0]);
             return;
@@ -137,7 +150,8 @@ public class JsonMutableType implements UserType, DynamicParameterizedType {
     }
 
     @Override
-    public Object replace(Object original, Object target, Object owner) throws HibernateException {
+    public Object replace(Object original, Object target,
+            Object owner) throws HibernateException {
         return json.deserialize(json.serialize(original, type), type);
     }
 
