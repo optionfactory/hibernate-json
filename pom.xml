@@ -40,16 +40,6 @@
         <developerConnection>scm:git:https://github.com/optionfactory/hibernate-json.git</developerConnection>
         <url>https://github.com/optionfactory/hibernate-json</url>
     </scm>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
     <properties>
         <aspectj.version>1.9.1</aspectj.version>
         <aspectj.plugin.version>1.11</aspectj.plugin.version>
@@ -127,9 +117,35 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <profiles>
+     <profiles>
+        <profile>
+            <id>nexus</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <distributionManagement>
+                <snapshotRepository>
+                     <id>nexus</id>
+                     <url>${env.NEXUS_SNAPSHOTS_URL}</url>
+                 </snapshotRepository>
+                 <repository>
+                     <id>nexus</id>
+                     <url>${env.NEXUS_RELEASES_URL}</url>
+                 </repository>
+            </distributionManagement>
+        </profile>
         <profile>
             <id>ossrh</id>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+                <repository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
             <build>
                 <plugins>
                     <plugin>
@@ -155,10 +171,7 @@
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
-                                <configuration>
-                                    <additionalparam>-Xdoclint:none</additionalparam>
-                                </configuration>
-                           </execution>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
