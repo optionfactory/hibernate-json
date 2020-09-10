@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker { 
-            image 'maven:3.6-jdk-8-alpine' 
+            image 'maven:3.6-jdk-11-slim' 
             args env.JOB_DOCKER_OPTS
         }
     }
