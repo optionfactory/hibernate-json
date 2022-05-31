@@ -4,4 +4,4 @@ build:
 bump:
 	mvn versions:set -DgenerateBackupPoms=false
 deploy-ossrh:
-	clean deploy -Possrh
+	mvn clean deploy -Possrh

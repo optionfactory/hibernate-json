@@ -4,11 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.optionfactory</groupId>
     <artifactId>hibernate-json</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.0</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Custom Hibernate types for serializing fields as JSON, using either jackson or gson</description>
     <url>https://github.com/optionfactory/hibernate-json</url>
+    <scm>
+        <connection>scm:git:https://github.com/optionfactory/hibernate-json.git</connection>
+        <developerConnection>scm:git:https://github.com/optionfactory/hibernate-json.git</developerConnection>
+        <url>https://github.com/optionfactory/hibernate-json</url>
+    </scm>    
     <licenses>
         <license>
             <name>Simplified BSD License</name>
@@ -36,11 +41,16 @@
             <organizationUrl>http://optionfactory.net</organizationUrl>
         </developer>
     </developers>
-    <scm>
-        <connection>scm:git:https://github.com/optionfactory/hibernate-json.git</connection>
-        <developerConnection>scm:git:https://github.com/optionfactory/hibernate-json.git</developerConnection>
-        <url>https://github.com/optionfactory/hibernate-json</url>
-    </scm>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -63,7 +73,7 @@
                 <version>2.13.3</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
+            </dependency>            
         </dependencies>
     </dependencyManagement>
     <dependencies>
