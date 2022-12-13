@@ -18,20 +18,18 @@ import org.hibernate.usertype.DynamicParameterizedType;
 import org.hibernate.usertype.UserType;
 import org.postgresql.util.PGobject;
 
-public class JsonType implements UserType, DynamicParameterizedType {
-
-    public static final String TYPE = "net.optionfactory.hj.JsonType";
+public class JsonType implements UserType<Object>, DynamicParameterizedType {
 
     public enum ColumnType {
         Text(Types.LONGVARCHAR), MysqlJson(Types.JAVA_OBJECT), PostgresJson(Types.JAVA_OBJECT), PostgresJsonb(Types.OTHER);
 
-        private final int[] sqlType;
+        private final int sqlType;
 
         ColumnType(int sqlType) {
-            this.sqlType = new int[]{sqlType};
+            this.sqlType = sqlType;
         }
 
-        public int[] sqlTypes() {
+        public int sqlType() {
             return this.sqlType;
         }
     }
@@ -63,13 +61,14 @@ public class JsonType implements UserType, DynamicParameterizedType {
     }
 
     @Override
-    public int[] sqlTypes() {
-        return ct.sqlTypes();
+    public int getSqlType() {
+        return ct.sqlType();
     }
-
+    
+    
     @Override
-    public Class<?> returnedClass() {
-        return type.rawClass();
+    public Class<Object> returnedClass() {
+        return (Class)type.rawClass();
     }
 
     @Override
@@ -83,8 +82,8 @@ public class JsonType implements UserType, DynamicParameterizedType {
     }
 
     @Override
-    public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner) throws HibernateException, SQLException {
-        final String string = rs.getString(names[0]);
+    public Object nullSafeGet(ResultSet rs, int position, SharedSessionContractImplementor session, Object owner) throws SQLException {
+        final String string = rs.getString(position);
         if (rs.wasNull() || string == null || string.isEmpty()) {
             return json.deserialize("null", type);
         }
@@ -98,7 +97,7 @@ public class JsonType implements UserType, DynamicParameterizedType {
     @Override
     public void nullSafeSet(PreparedStatement ps, Object value, int index, SharedSessionContractImplementor si) throws HibernateException, SQLException {
         if (value == null) {
-            ps.setNull(index, ct.sqlTypes()[0]);
+            ps.setNull(index, ct.sqlType());
             return;
         }
         ps.getConnection().getMetaData().getDatabaseProductName();

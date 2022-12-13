@@ -18,7 +18,7 @@ import org.hibernate.usertype.DynamicParameterizedType;
 import org.hibernate.usertype.UserType;
 import org.postgresql.util.PGobject;
 
-public class JsonMutableType implements UserType, DynamicParameterizedType {
+public class JsonMutableType implements UserType<Object>, DynamicParameterizedType {
 
     public static final String TYPE = "net.optionfactory.hj.JsonMutableType";
 
@@ -49,13 +49,13 @@ public class JsonMutableType implements UserType, DynamicParameterizedType {
     }
 
     @Override
-    public int[] sqlTypes() {
-        return ct.sqlTypes();
+    public int getSqlType() {
+        return ct.sqlType();
     }
 
     @Override
-    public Class<?> returnedClass() {
-        return type.rawClass();
+    public Class<Object> returnedClass() {
+        return (Class) type.rawClass();
     }
 
     @Override
@@ -69,8 +69,8 @@ public class JsonMutableType implements UserType, DynamicParameterizedType {
     }
 
     @Override
-    public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner) throws HibernateException, SQLException {
-        final String string = rs.getString(names[0]);
+    public Object nullSafeGet(ResultSet rs, int position, SharedSessionContractImplementor session, Object owner) throws SQLException {
+        final String string = rs.getString(position);
         if (rs.wasNull() || string == null || string.isEmpty()) {
             return json.deserialize("null", type);
         }
@@ -84,7 +84,7 @@ public class JsonMutableType implements UserType, DynamicParameterizedType {
     @Override
     public void nullSafeSet(PreparedStatement ps, Object value, int index, SharedSessionContractImplementor si) throws HibernateException, SQLException {
         if (value == null) {
-            ps.setNull(index, ct.sqlTypes()[0]);
+            ps.setNull(index, ct.sqlType());
             return;
         }
         ps.getConnection().getMetaData().getDatabaseProductName();
