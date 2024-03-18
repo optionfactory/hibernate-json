@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.optionfactory</groupId>
     <artifactId>hibernate-json</artifactId>
-    <version>6.2-SNAPSHOT</version>
+    <version>6.2</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Custom Hibernate types for serializing fields as JSON, using either jackson or gson</description>
