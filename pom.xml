@@ -63,7 +63,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>6.1.12</version>
+                <version>6.1.13</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>6.6.0.Final</version>
+            <version>6.6.1.Final</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -111,7 +111,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.3</version>
+            <version>42.7.4</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -157,9 +157,9 @@
                 <artifactId>aspectj-maven-plugin</artifactId>
                 <version>1.15.0</version>
                 <configuration>
-                    <complianceLevel>17</complianceLevel>
-                    <source>17</source>
-                    <target>17</target>
+                    <complianceLevel>21</complianceLevel>
+                    <source>21</source>
+                    <target>21</target>
                     <outxml>true</outxml>
                     <aspectLibraries>
                         <aspectLibrary>
@@ -198,22 +198,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.8.0</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <failOnError>false</failOnError>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <version>3.5.0</version>
                 <executions>
@@ -242,7 +226,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.5</version>
+                        <version>3.2.6</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -256,7 +240,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.8.0</version>
+                        <version>3.10.0</version>
                         <configuration>
                             <doclint>none</doclint>
                         </configuration>                        
