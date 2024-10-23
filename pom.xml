@@ -63,7 +63,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>6.1.13</version>
+                <version>6.1.14</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -240,7 +240,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.10.0</version>
+                        <version>3.10.1</version>
                         <configuration>
                             <doclint>none</doclint>
                         </configuration>                        
